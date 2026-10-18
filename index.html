@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LabQuest '26 - School Group Pre-Registration</title>
+  <style>
+    :root {
+      --primary: #0b1d3a;
+      --accent: #1e88e5;
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 520px;
+      padding: 35px 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .header-tag {
+      text-align: center;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    h1 { text-align: center; font-size: 26px; color: #fff; margin-bottom: 8px; }
+    .subtitle { text-align: center; color: var(--text-muted); font-size: 14px; margin-bottom: 25px; }
+
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #cbd5e1; }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    input:focus { outline: none; border-color: var(--accent); }
+
+    .student-section {
+      background: #0f172a;
+      padding: 18px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      margin-bottom: 20px;
+    }
+
+    .student-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .student-header h3 { font-size: 15px; color: var(--accent); }
+    .student-count-badge { font-size: 12px; color: var(--text-muted); }
+
+    .student-input-wrapper {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .student-input-wrapper input { flex: 1; }
+
+    .remove-btn {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 0 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .add-btn {
+      background: transparent;
+      border: 1px dashed var(--accent);
+      color: var(--accent);
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .add-btn:hover { background: rgba(30, 136, 229, 0.1); }
+
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #1e88e5, #1565c0);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    #status { text-align: center; margin-top: 18px; font-size: 14px; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header-tag">Asoka Vidyalaya Science Society</div>
+    <h1>LABQUEST '26</h1>
+    <p class="subtitle">School Group Pre-Registration (Max 10 Students)</p>
+
+    <form id="reg-form">
+      <div class="form-group">
+        <label>School Name</label>
+        <input type="text" id="schoolName" placeholder="e.g. Royal College" required>
+      </div>
+
+      <div class="form-group">
+        <label>Teacher / Lead Contact Person</label>
+        <input type="text" id="leadName" placeholder="e.g. Mr. Perera / Student Representative" required>
+      </div>
+
+      <div class="form-group">
+        <label>Lead Email Address</label>
+        <input type="email" id="email" placeholder="name@example.com" required>
+      </div>
+
+      <div class="form-group">
+        <label>Contact Phone Number</label>
+        <input type="tel" id="phone" placeholder="07x xxx xxxx" required>
+      </div>
+
+      <!-- Dynamic Student List -->
+      <div class="student-section">
+        <div class="student-header">
+          <h3>Student Members</h3>
+          <span class="student-count-badge" id="count-badge">1 / 10 Added</span>
+        </div>
+
+        <div id="student-container">
+          <div class="student-input-wrapper">
+            <input type="text" class="student-name" placeholder="Student 1 Full Name" required>
+          </div>
+        </div>
+
+        <button type="button" class="add-btn" id="add-student-btn">+ Add Another Student (Max 10)</button>
+      </div>
+
+      <button type="submit" class="submit-btn" id="sub-btn">Submit School Pre-Registration</button>
+    </form>
+
+    <p id="status"></p>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "YOUR_GOOGLE_WEB_APP_URL_HERE";
+
+    const studentContainer = document.getElementById('student-container');
+    const addStudentBtn = document.getElementById('add-student-btn');
+    const countBadge = document.getElementById('count-badge');
+    const MAX_STUDENTS = 10;
+
+    function updateCount() {
+      const count = studentContainer.children.length;
+      countBadge.textContent = `${count} / ${MAX_STUDENTS} Added`;
+      if (count >= MAX_STUDENTS) {
+        addStudentBtn.style.display = 'none';
+      } else {
+        addStudentBtn.style.display = 'block';
+      }
+    }
+
+    addStudentBtn.addEventListener('click', () => {
+      const count = studentContainer.children.length;
+      if (count < MAX_STUDENTS) {
+        const div = document.createElement('div');
+        div.className = 'student-input-wrapper';
+        div.innerHTML = `
+          <input type="text" class="student-name" placeholder="Student ${count + 1} Full Name" required>
+          <button type="button" class="remove-btn">×</button>
+        `;
+        div.querySelector('.remove-btn').addEventListener('click', () => {
+          div.remove();
+          updateCount();
+        });
+        studentContainer.appendChild(div);
+        updateCount();
+      }
+    });
+
+    document.getElementById('reg-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const btn = document.getElementById('sub-btn');
+      const status = document.getElementById('status');
+      
+      const studentInputs = document.querySelectorAll('.student-name');
+      const studentList = Array.from(studentInputs).map(i => i.value.trim()).filter(v => v !== '');
+
+      if (studentList.length === 0) {
+        alert("Please enter at least one student name!");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Registering School Group...";
+      status.style.color = "#38bdf8";
+      status.textContent = "Saving group registration & sending confirmation email...";
+
+      const payload = {
+        schoolName: document.getElementById('schoolName').value,
+        leadName: document.getElementById('leadName').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        students: studentList
+      };
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        status.style.color = "#4ade80";
+        status.textContent = "School group registered successfully! Confirmation email sent. 🎉";
+        document.getElementById('reg-form').reset();
+        // Reset students back to 1 input
+        studentContainer.innerHTML = `
+          <div class="student-input-wrapper">
+            <input type="text" class="student-name" placeholder="Student 1 Full Name" required>
+          </div>
+        `;
+        updateCount();
+      })
+      .catch(err => {
+        status.style.color = "#f87171";
+        status.textContent = "Something went wrong. Please try again!";
+      })
+      .finally(() => {
+        btn.disabled = false;
+        btn.textContent = "Submit School Pre-Registration";
+      });
+    });
+  </script>
+</body>
+</html>
